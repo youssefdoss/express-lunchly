@@ -49,19 +49,20 @@ class Reservation {
     return this._numGuests;
   }
 
+  // We don't know why this broke
   /** Sets _startAt and ensures a date object is passed in, otherwise throws an error. */
-  set startAt(startAt) {
-    if (!(startAt instanceof Date)) {
-      throw new BadRequestError("You must enter a valid date.");
-    } else {
-      this._startAt = startAt;
-    }
-  }
+  // set startAt(startAt) {
+  //   if (!(startAt instanceof Date)) {
+  //     throw new BadRequestError("You must enter a valid date.");
+  //   } else {
+  //     this._startAt = startAt;
+  //   }
+  // }
 
-  /** Gets _startAt */
-  get startAt() {
-    return this._startAt;
-  }
+  // /** Gets _startAt */
+  // get startAt() {
+  //   return this._startAt;
+  // }
 
   /** sets _note to an empty string if falsey value passed in. */
   set notes(note) {
@@ -75,6 +76,31 @@ class Reservation {
   /** gets _note. */
   get notes() {
     return this._notes;
+  }
+
+  /** get a reservation by ID. */
+
+  static async get(id) {
+    const results = await db.query(
+      `SELECT id,
+              customer_id AS "customerId",
+              start_at AS "startAt",
+              num_guests  AS "numGuests",
+              notes
+      FROM reservations
+      WHERE id = $1`,
+      [id]
+    );
+
+    const reservation = results.rows[0];
+
+    if (reservation === undefined) {
+      const err = new Error(`No such reservation: ${id}`);
+      err.status = 404;
+      throw err;
+    }
+
+    return new Reservation(reservation);
   }
 
   /** formatter for startAt */

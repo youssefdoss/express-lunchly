@@ -46,6 +46,7 @@ class Customer {
     const results = await db.query(
       `SELECT id,
               first_name AS "firstName",
+              middle_name AS "middleName",
               last_name  AS "lastName",
               phone,
               notes
@@ -130,10 +131,10 @@ class Customer {
   async save() {
     if (this.id === undefined) {
       const result = await db.query(
-        `INSERT INTO customers (first_name, last_name, phone, notes)
-            VALUES ($1, $2, $3, $4)
+        `INSERT INTO customers (first_name, middle_name, last_name, phone, notes)
+            VALUES ($1, $2, $3, $4, $5)
             RETURNING id`,
-        [this.firstName, this.lastName, this.phone, this.notes]
+        [this.firstName, this.middleName, this.lastName, this.phone, this.notes]
       );
       this.id = result.rows[0].id;
     } else {

@@ -48,6 +48,30 @@ router.get('/top-ten/', async function (req, res) {
   return res.render("customer_list.html", { customers });
 });
 
+/** Show form to edit a reservation. */
+
+router.get("/reservation/:id/edit/", async function (req, res, next) {
+  const reservation = await Reservation.get(req.params.id);
+  debugger;
+
+  res.render("reservation_edit_form.html", { reservation });
+});
+
+/** Handle editing a reservation. */
+
+router.post("/reservation/:id/edit/", async function (req, res, next) {
+  if (req.body === undefined) {
+    throw new BadRequestError();
+  }
+  const reservation = await Reservation.get(req.params.id);
+  reservation.startAt = req.body.startAt;
+  reservation.numGuests = req.body.numGuests;
+  reservation.notes = req.body.notes;
+  await reservation.save();
+
+  return res.redirect(`/${reservation.customerId}/`);
+});
+
 /** Show a customer, given their ID. */
 
 router.get("/:id/", async function (req, res, next) {
